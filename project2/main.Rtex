@@ -1,0 +1,323 @@
+\documentclass{article}
+\usepackage[polish]{babel}
+\usepackage[a4paper,
+    top=2cm,
+    bottom=2cm,
+    left=2cm,
+    right=2cm,
+    includehead]{geometry}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage[colorlinks=true, allcolors=black]{hyperref}
+\usepackage{fancyhdr}
+\usepackage[T1]{fontenc}
+\usepackage{subcaption}
+\usepackage{lastpage}
+\usepackage{float}
+
+\pagenumbering{arabic}
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{Dominik Adamczyk}
+\lhead{Metoda różnic skończonych}
+\fancyfoot[R]{Strona \thepage \hspace{1pt} z \pageref{LastPage}}
+% \font\titleFont=ComicSansat 36pt
+% \font\authorFont=cmr12 at 20pt
+
+
+\title{\Huge Zastosowanie metody różnic skończonych do rozwiązania równania różniczkowego zwyczajnego rzędu drugiego \ \\ \ \\}
+\author{\Large Dominik Adamczyk \\ Równania różniczkowe i różnicowe 2022/2023}
+\date{}
+
+
+\begin{document}
+\maketitle
+
+\newpage
+\tableofcontents
+\newpage
+
+\section{Opis problemu}
+\qquad Przedstawiony w tym dokumencie problem polega na numerycznym rozwiązaniu równania różniczkowego (1) na przedziale $[0,1]$
+\begin{equation}
+    u''(x)-2u'(x)+u(x) = x^2 + 3
+\end{equation}
+z zadanymi warunkami brzegowymi (2), (3)
+\begin{equation}
+    u(0)=1
+\end{equation}
+\begin{equation}
+    u(1) + 2u'(1) = 2
+\end{equation}
+Użyta do tego zostanie metoda różnic skończonych, umożliwiająca numeryczne obliczenie funkcji $u(x)$ przy pomocy jej przybliżonych pochodnych.
+
+\noindent \qquad Dodatkowo w sprawozdaniu znajduje się wykres powyższej funkcji, wraz z porównaniem rozwiązania numerycznego z rozwiązaniem dokładnym.
+
+\section{Użyte narzędzia}
+\qquad Do implementacji procedur obliczających numeryczne rozwiązanie równania, a także do wykreślania odpowiednich grafów użyty został język programowania R, oraz środowisko RStudio. Sprawozdanie zostało napisane przy pomocy LaTeX z pakietem Knitr umożliwiającym wykonywanie kodu z języka R wewnątrz dokumentu.
+\section{Rozwiązanie dokładne}
+\noindent \qquad Pierwszym etapem powinno być sprawdzenie, czy powyższe równanie różniczkowe ma rozwiązanie. Wystarczy w tym celu obliczyć rozwiązanie jednorodne równania różniczkowego. W tym punkcie od razu zostanie wyznaczone dokładne równanie, gdyż jego wynik będzie potrzebny w dalszej części projektu.
+
+\noindent \qquad Na początku wyznaczone zostanie rozwiązanie równania jednorodnego:
+\begin{equation}
+     u''(x)-2u'(x)+u(x) = 0 \notag
+\end{equation}
+Równanie charakterystyczne w tym przypadku ma postać:
+\begin{equation}
+    \Phi(\lambda) = \lambda^2-2\lambda+1 = (\lambda-1)^2 \notag
+\end{equation}
+Powyższe równanie ma jeden podwójny pierwiastek rzeczywisty $\lambda$, więc funkcje $u_1(x) = e^x,\; u_2 = xe^x$ stanowią układ fundamentalny rozwiązania równania jednorodnego. Wtedy równanie jednorodne przyjmuje postać:
+\begin{equation}
+    u_0(x) = c_1e^x + c_2xe^x
+\end{equation}
+Kolejno wyznaczone zostanie równanie szczegółowe $U(x)$. Używając metody przewidywań przyjmuję: 
+ \begin{align*}
+    U(x)=a_2x^2+a_1x+a_0 \\
+    U'(x) = 2a_2x+a_1 \\
+    U''(x) = 2a_2
+\end{align*}
+Wstawiając powyższe równania do (1) otrzymujemy:
+\begin{align*}
+    2a_2-4a_2x - 2a_1+a_2x^2+a_1x+a_0 = x^2 + 3 \\
+    a_2x^2 + (a_1 - 4a_2)x +a_0 - 2a_1 + a_2 = x^2 + 3
+\end{align*}
+Do wyznaczenia współczynników $a_i$ konieczne będzie rozwiązanie układu równań:
+\begin{equation}
+    \begin{cases} \notag
+        a_2 = 1 \\
+        a_1 - 4a_2 = 0 \\
+        a_0 -2a_1  + 2a_2 = 3
+    \end{cases}
+\end{equation}
+Po jego rozwiązaniu otrzymane zostaje rozwiązanie szczegółowe:
+\begin{equation}
+    U(x) = x^2 + 4x + 9
+\end{equation}
+Rozwiązaniem równania (1) jest zatem suma rozwiązania jednorodnego i szczegółowego:
+\begin{equation}
+    u(x) = u_0(x) + U(x) = c_1e^x + c_2xe^x + x^2 + 4x + 9
+\end{equation}
+Do wyznaczenia współczynnika $c_1$ wystarczy użyć warunku brzegowego (2). Po podstawieniu $x = 0$ otrzymamy:
+\begin{align*}
+    c_1 + 9 = 1 \\
+    c_1 = -8
+\end{align*}
+Znając $c_1$ można obliczyć $c_2$ używając warunku brzegowego (3):
+\begin{equation}
+    u(1) + 2u'(1) = -8e^1 + c_2e + 1 + 4 + 9 + 2c_2e + 2c_2e - 16e + 4 + 8 = 2 \notag
+\end{equation}
+\begin{equation}
+    c_2 = \frac{24-24e}{5e} \notag
+\end{equation}
+W ten sposób otrzymujemy algebraiczne rozwiązanie przedstawionego w punkcie pierwszym problemu początkowego:
+\begin{equation}
+    u(x) = -8e^x + \frac{24-24e}{5e}xe^x + x^2 + 4x + 9
+\end{equation}
+\section{Rozwiązanie numeryczne}
+\subsection{Układ równań}
+\qquad Na potrzeby objaśnień użyta zostanie notacja $u(x_{i-1}), u(x_i), u(x_{i+1})$, gdzie $u(x_i)$ oznacza i-tą w kolejności wartość wyznaczanej funkcji $u(x)$. Algorytm będzie wyznaczał kolejne $n$ wartości funkcji $u(x)$ w równych odstępach. Jeżeli za $h = \frac{1}{n}$ przyjmiemy odległość między dwoma kolejnymi wartościami funkcji $u(x)$, to $u(x_{i-1}) = u(x_i - h)$, oraz $u(x_{i+1}) = u(x_i + h)$. Wartości $x_i$ wynoszą $i * h$, w szczególności $u(x_0) = u(0)$, a $u(x_n) = u(1)$.
+
+\noindent\qquad Do wyznaczenia układu równań, na którego wynikiem będzie rozwiązanie równania w określonych punktach posłużą przybliżenia pierwszej i drugiej pochodnej:
+\begin{equation}
+    u'(x_i) \approx \frac{u(x_{i+1}) - u(x_{i-1})}{h}
+\end{equation}
+\begin{equation}
+    u''(x_i) \approx \frac{u(x_{i+1}) -2u(x_i) + u(x_{i-1})}{h}
+\end{equation}
+\qquad Wstawiając powyższe przybliżenia pochodnych do równania (1) otrzymujemy:
+\begin{equation}
+    \frac{u(x_{i+1}) -2u(x_i) + u(x_{i-1})}{h} - 2\frac{u(x_{i+1}) - u(x_{i-1})}{h} + u(x_i) = x_i^2 + 3 \notag
+\end{equation}
+co po przekształceniach daje:
+\begin{equation}
+    u(x_{i-1})(\frac{1}{h^2} + \frac{1}{h}) + u(x_{i})(1 - \frac{2}{h^2}) + u(x_{i+1})(\frac{1}{h^2} - \frac{1}{h}) = x_i^2+3
+\end{equation}
+Przy pomocy równania (10) konstruowany jest układ równań. Dla dla każdego $i \in \{2,..,n-1\}$ współczynniki przy $u(x_{i-1}), u(x_i), u(x_{i+1})$ będą takie same. Jedyne różnice występować będą dla $i = 1$, oraz $i = n$. Do ich rozwiązania konieczne będzie skorzystanie z warunków początkowych.
+
+\noindent \qquad Dla $i = 1$ otrzymamy równanie:
+\begin{equation}
+    u(x_0)(\frac{1}{h^2} + \frac{1}{h}) + u(x_{1})(1 - \frac{2}{h^2}) + u(x_{2})(\frac{1}{h^2} - \frac{1}{h}) = x_1^2+3 \notag
+\end{equation}
+Jako że $u(x_0) = u(0)$, to możliwe jest skorzystanie z warunku brzegowego (2), w rezultacie otrzymuąc równanie:
+\begin{equation}
+    u(x_{1})(1 - \frac{2}{h^2}) + u(x_{2})(\frac{1}{h^2} - \frac{1}{h}) = x_1^2+3 - (\frac{1}{h^2} + \frac{1}{h}) 
+\end{equation}
+\qquad Dla $i = n$ otrzymamy równanie:
+\begin{equation}
+   u(x_{n-1})(\frac{1}{h^2} + \frac{1}{h}) + u(x_{n})(1 - \frac{2}{h^2}) + u(x_{n+1})(\frac{1}{h^2} - \frac{1}{h}) = x_n^2+3
+\end{equation}
+Można je uprościć korzystając z równości $u(x_n) = u(1)$, warunku brzegowego (3) i przybliżenia pierwszej pochodnej (8). Przekształcając ten warunek otrzymamy:
+\begin{align*}
+    u(x_n) + 2u'(x_n) = 2 \\
+    u(x_n) + \frac{u(x_{n+1}) - u(x_{n-1})}{h} = 2\\
+    u(x_{n+1}) = 2h + u(x_{n-1}) - h*u(x_n)
+\end{align*}
+Po wstawieniu wyliczonego powyżej $u(x_{n+1})$ do równania (12) otrzymamy:
+\begin{equation}
+    u(x_{n-1})(\frac{1}{h^2} + \frac{1}{h}) + u(x_{n})(1 - \frac{2}{h^2}) + (2h + u(x_{n-1}) - h*u(x_n))(\frac{1}{h^2} - \frac{1}{h}) = x_n^2+3 \notag
+\end{equation}
+\begin{equation}
+    u(x_{n-1})(\frac{2}{h^2}) + u(x_{n})(2 -\frac{1}{h} - \frac{2}{h^2}) = x_n^2+3 - 2h(\frac{1}{h^2} - \frac{1}{h})
+\end{equation}
+\qquad Przy pomocy równań (10), (11), (13) można stworzyć układ równań w postaci macierzowej $Ax=B$. Macierz $A$ wypełniona zostanie współczynnikami po lewej stronie równości, macierz $B$ to elementy po prawej stronie równości, a macierz $x$ to szukane współczynniki $u(x_i)$. Pierwsze z wierszy macierzy $A$ i $B$ zostaną uzupełnione równością (11), ostatnie równością (13), a pozostałe przy pomocy równości (10).
+
+\subsection{Rozwiązywanie układu równań}
+\qquad Macierz A z poprzedniego układu równań jest szczególnym przypadkiem macierzy rzadkiej - macierzą trójdiagonalną. Równania, w których współczynniki reprezentowane są przez taką macierz możliwe są do rozwiązania w czasie liniowym $O(n)$, podczas gdy standardowa metoda Gaussa osiąga czas rzędu $O(n^3)$. Poniżej prezentowany jest algorytm Thomasa zaimplementowany w języku R służący do rozwiązania tego typu układów równań.
+
+<<echo=TRUE, cache=TRUE>>=
+tridiagonal_matrix <- function(below, diagonal, over, func) {
+  # below - współczynniki tuż poniżej głównej przekątnej macierzy A
+  # diagonal - współczynniki na głównej przekątnej macierzy A
+  # over - współczynniki tuż nad główną przekątną macierzy A
+  # func - wartości macierzy B
+  n <- length(diagonal)
+  
+  over[1] <- over[1] / diagonal[1]
+  func[1] <- func[1] / diagonal[1]
+  
+  for(i in 2:(n - 1)) {
+    over[i] <- over[i] / (diagonal[i] - below[i - 1] * over[i - 1])
+    func[i] <- (func[i] - below[i - 1] * func[i - 1]) /
+      (diagonal[i] - below[i - 1] * over[i - 1])
+  }
+  func[n] <- (func[n] - below[n - 1] * func[n - 1]) /
+    (diagonal[n] - below[n - 1] * over[n - 1])
+
+  x <- vector(length = n)
+  x[n] <- func[n]
+  for(i in (n - 1):1)
+    x[i] <- func[i] - over[i] * x[i + 1]
+  
+  return(x)
+}
+@
+\newpage
+\subsection{Algorytm główny}
+\qquad Główny algorytm programu sprowadza się do uzupełnienia w odpowiedni sposób wektorów reprezentujących trzy przekątne rozpatrywanej macierzy, a także wektora z wartościami macierzy B. Następnie uruchamiany jest algorytm Thomasa, który oblicza wartości funkcji $u(x)$.
+
+<<echo=TRUE, cache=TRUE>>=
+f <- function(x){ # Prawa strona równania (10)
+  return (x*x + 3)
+}
+@
+<<echo=TRUE, cache=TRUE>>=
+solve_equation <- function(n){
+  # n reprezentuje liczbę przedziałów na jakie zostanie podzielony obszar [0, 1]
+  h = 1 / n
+  
+  # Inicjalizacja wektorów, nazwy analogiczne do tych z algorytmu Thomasa
+  diag <- vector(length = n)
+  below <- vector(length = n-1)
+  over <- vector(length = n-1)
+  func <- vector(length = n)
+
+  # Współczynniki poszczególnych przekątnych wyznaczone w równaniu (10)
+  diag_coof <- 1 - 2/h^2
+  below_coof <- 1/h^2 + 1/h
+  over_coof <- 1/h^2 - 1/h
+
+  # Uzupełnianie przekątnch macierzy a i macierzy B
+  for (i in 1:(n-1)){
+    func[i] <- f(i * h)
+    diag[i] <- diag_coof
+    below[i] <- below_coof
+    over[i] <- over_coof
+  }
+
+  # Uwzględnienie warunku początkowego dla pierwszego rzędu obliczonego w równaniu (11)
+  func[1] = func[1] - below_coof
+
+  # Uwzględnienie warunku początkowego dla ostatniego rzędu obliczonego w równaniu (13)
+  diag[n] <- diag_coof + over_coof*(-h)
+  below[n-1] <- below_coof + over_coof
+  func[n] <- f(1) - over_coof * 2 * h
+  
+  output <- tridiagonal_matrix(below, diag, over, func)
+  output <- c(1, output)
+  return (output)
+}
+@
+
+ \noindent \qquad Funkcja $solve\_equation(n)$ rozwiązuje zadane równanie różniczkowe i zwraca wektor z $n+1$ wartościami reprezentującymi kolejne wartości funkcji $u(x)$ na przedziale $[0, 1]$, tak, że i-ta wartość w wektorze reprezentuje wartość funkcji w punkcie $\frac{i}{n}$. Poniżej prezentowane są wyniki programu dla $n = 10$, oraz $n = 50$. Program działa dla dowolnego $n > 2$.
+
+<<>>=
+solve_equation(10)
+@
+
+<<>>=
+solve_equation(50)
+@
+
+\section{Wykres funkcji u(x)}
+\qquad Przedstawiona poniżej procedura odpowiada za narysowanie wykresu $u(x)$ przy pomocy wartości uzyskanych z funkcji $solve\_equation$.
+
+<<>>=
+plot_approximate_sollution <- function(eq, color="violet"){
+  n = length(eq) - 1
+  h = 1 / n
+  a = 0
+  b = 1
+  x_vals = seq(a, b, h)
+  
+  plot(x_vals, eq, type="l", col=color, lwd="3",
+       main=paste("Wykres funkcji u(x) przy n =", n), xlab="x", ylab="y")
+}
+ @
+ 
+\noindent \qquad Poniżej prezentowane są wykresy dla rozwiązań z wartościami $n = 10$, oraz $n = 50$.
+
+<<plot1, fig.pos="h",fig.align="center", fig.height=4, fig.width=4>>=
+plot_approximate_sollution(solve_equation(10))
+ @
+<<plot2, fig.pos="h",fig.align="center", fig.height=4, fig.width=4>>=
+plot_approximate_sollution(solve_equation(50))
+@
+
+\section{Porównanie z rozwiązaniem dokładnym}
+\qquad W punkcie 3 obliczone zostało rozwiązanie dokładne. Na jego podstawie wykonane zostało porównanie wyników zwracanych przez wcześniej opisane funkcje z rzeczywistymi wartościami funkcji $u(x)$. Poniżej przedstawiona funkcja $compare\_with\_exact$ przyjmuje rozwiązanie przybliżone i porównuje je z rozwiązaniem dokładnym (obliczany przy pomocy funkcji $exact\_u$. Porównanie polega na narysowaniu odpowiedniego wykresu, a także zwróceniu błędu globalnego.
+
+<<>>=
+exact_u <- function(x){
+  (24*(exp(1) - 1)/(5 * exp(1)))*x*exp(x) - 8*exp(x) + x^2 + 4*x + 9
+}
+
+compare_with_exact <- function(approximation, color="violet"){
+  n = length(approximation) - 1
+  h = 1 / n
+  a = 0
+  b = 1
+  x_vals = seq(a, b, h)
+  
+  plot(x_vals, approximation, type="l", col=color, lwd="4",
+       main="Wykres funkcji u(x)", xlab="x", ylab="y")
+  curve(exact_u, from=a, to=b, lwd=2, add=TRUE)
+  legend(x="topright", legend=c("Rozwiazanie dokladne",
+  paste("Rozwiazanie przyblizone dla n =",n)),
+         col=c("black", "violet"), lwd=c(2, 4), text.font=4, bg='lightblue')
+  
+  exact_vals = exact_u(x_vals)
+  error = abs(exact_vals - approximation)
+  global_error <- max(error)
+  return(global_error)
+}
+@
+\noindent \qquad Poniżej prezentowane są porównania rozwiązania dokładnego i numerycznego funkcji dla wartości $n=10$ i $n=50$.
+<<plot3, fig.pos="h",fig.align="center", fig.height=7, fig.width=7>>=
+compare_with_exact(solve_equation(10))
+##     ^^^ błąd globalny
+@
+\newpage
+<<plot4, fig.pos="h",fig.align="center", fig.height=7, fig.width=7>>=
+compare_with_exact(solve_equation(50))
+##     ^^^ błąd globalny
+@
+\newpage
+\section{Wnioski}
+\qquad Prezentowana w tym dokumencie metoda numerycznego obliczania wyniku równania różniczkowego pozwala z dobrą dokładnością wyznaczyć prawidłowe rozwiązanie, co pokazuje porównanie przedstawione w poprzednim punkcie. Dodatkowo wyznaczenie błędu globalnego pokazuje, że prezentowana metoda w istocie ma jest rzędu $O(h^2)$. Dla $n = 10$ (czyli $h = 0.1$) błąd globalny wynosił 0.01042767, czyli w przybliżeniu $h^2$, tak samo sytuacja wyglądała dla $n = 50$, czyli $h=0.02$, gdzie błąd globalny wyniósł 0.0004148776. Prezentowana metoda dodatkowo ma bardzo dobrą złożoność obliczeniową rzędu $O(n)$ dzięki liniowemu rozwiązywaniu układu równań z użyciem algorytmu Thomasa. 
+
+\begin{thebibliography}{}
+\bibitem{texbook}
+\href{https://en.wikipedia.org/wiki/Tridiagonal_matrix_algorithm}{https://en.wikipedia.org/wiki/Tridiagonal\_matrix\_algorithm}
+\end{thebibliography}
+
+\end{document}
