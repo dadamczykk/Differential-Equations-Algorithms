@@ -51,7 +51,7 @@ z zadanymi warunkami brzegowymi (2), (3)
 \end{equation}
 Użyta do tego zostanie metoda różnic skończonych, umożliwiająca numeryczne obliczenie funkcji $u(x)$ przy pomocy jej przybliżonych pochodnych.
 
-\noindent \qquad Dodatkowo w sprawozdaniu znajduje się wykres powyższej funkcji, wraz z porównaniem rozwiązania numerycznego z rozwiązaniem dokładnym.
+\noindent \qquad Dodatkowo w sprawozdaniu znajduje się wykres powyższej funkcji wraz z porównaniem rozwiązania numerycznego z rozwiązaniem dokładnym.
 
 \section{Użyte narzędzia}
 \qquad Do implementacji procedur obliczających numeryczne rozwiązanie równania, a także do wykreślania odpowiednich grafów użyty został język programowania R, oraz środowisko RStudio. Sprawozdanie zostało napisane przy pomocy LaTeX z pakietem Knitr umożliwiającym wykonywanie kodu z języka R wewnątrz dokumentu.
@@ -64,7 +64,7 @@ Użyta do tego zostanie metoda różnic skończonych, umożliwiająca numeryczne
 \end{equation}
 Równanie charakterystyczne w tym przypadku ma postać:
 \begin{equation}
-    \Phi(\lambda) = \lambda^2-2\lambda+1 = (\lambda-1)^2 \notag
+    \Phi(\lambda) = \lambda^2-2\lambda+1 \Rightarrow \Phi(\lambda) = (\lambda-1)^2 \notag
 \end{equation}
 Powyższe równanie ma jeden podwójny pierwiastek rzeczywisty $\lambda$, więc funkcje $u_1(x) = e^x,\; u_2 = xe^x$ stanowią układ fundamentalny rozwiązania równania jednorodnego. Wtedy równanie jednorodne przyjmuje postać:
 \begin{equation}
@@ -119,14 +119,14 @@ W ten sposób otrzymujemy algebraiczne rozwiązanie przedstawionego w punkcie pi
 
 \noindent\qquad Do wyznaczenia układu równań, na którego wynikiem będzie rozwiązanie równania w określonych punktach posłużą przybliżenia pierwszej i drugiej pochodnej:
 \begin{equation}
-    u'(x_i) \approx \frac{u(x_{i+1}) - u(x_{i-1})}{h}
+    u'(x_i) \approx \frac{u(x_{i+1}) - u(x_{i-1})}{2h}
 \end{equation}
 \begin{equation}
-    u''(x_i) \approx \frac{u(x_{i+1}) -2u(x_i) + u(x_{i-1})}{h}
+    u''(x_i) \approx \frac{u(x_{i+1}) -2u(x_i) + u(x_{i-1})}{h^2}
 \end{equation}
 \qquad Wstawiając powyższe przybliżenia pochodnych do równania (1) otrzymujemy:
 \begin{equation}
-    \frac{u(x_{i+1}) -2u(x_i) + u(x_{i-1})}{h} - 2\frac{u(x_{i+1}) - u(x_{i-1})}{h} + u(x_i) = x_i^2 + 3 \notag
+    \frac{u(x_{i+1}) -2u(x_i) + u(x_{i-1})}{h^2} - 2\frac{u(x_{i+1}) - u(x_{i-1})}{2h} + u(x_i) = x_i^2 + 3 \notag
 \end{equation}
 co po przekształceniach daje:
 \begin{equation}
@@ -274,13 +274,12 @@ plot_approximate_solution(solve_equation(50))
 @
 
 \section{Porównanie z rozwiązaniem dokładnym}
-\qquad W punkcie 3 obliczone zostało rozwiązanie dokładne. Na jego podstawie wykonane zostało porównanie wyników zwracanych przez wcześniej opisane funkcje z rzeczywistymi wartościami funkcji $u(x)$. Poniżej przedstawiona funkcja $compare\_with\_exact$ przyjmuje rozwiązanie przybliżone i porównuje je z rozwiązaniem dokładnym (obliczany przy pomocy funkcji $exact\_u$. Porównanie polega na narysowaniu odpowiedniego wykresu, a także zwróceniu błędu globalnego.
+\qquad W punkcie 3 obliczone zostało rozwiązanie dokładne. Na jego podstawie wykonane zostało porównanie wyników zwracanych przez wcześniej opisane funkcje z rzeczywistymi wartościami funkcji $u(x)$. Poniżej przedstawiona funkcja $compare\_with\_exact$ przyjmuje rozwiązanie przybliżone i porównuje je z rozwiązaniem dokładnym (obliczany przy pomocy funkcji $exact\_u$). Porównanie polega na narysowaniu odpowiedniego wykresu, a także zwróceniu błędu globalnego.
 
 <<>>=
 exact_u <- function(x){
   (24*(exp(1) - 1)/(5 * exp(1)))*x*exp(x) - 8*exp(x) + x^2 + 4*x + 9
 }
-
 compare_with_exact <- function(approximation, color="violet"){
   n = length(approximation) - 1
   h = 1 / n
@@ -313,7 +312,7 @@ compare_with_exact(solve_equation(50))
 @
 \newpage
 \section{Wnioski}
-\qquad Prezentowana w tym dokumencie metoda numerycznego obliczania wyniku równania różniczkowego pozwala z dobrą dokładnością wyznaczyć prawidłowe rozwiązanie, co pokazuje porównanie przedstawione w poprzednim punkcie. Dodatkowo wyznaczenie błędu globalnego pokazuje, że prezentowana metoda w istocie ma jest rzędu $O(h^2)$. Dla $n = 10$ (czyli $h = 0.1$) błąd globalny wynosił 0.01042767, czyli w przybliżeniu $h^2$, tak samo sytuacja wyglądała dla $n = 50$, czyli $h=0.02$, gdzie błąd globalny wyniósł 0.0004148776. Prezentowana metoda dodatkowo ma bardzo dobrą złożoność obliczeniową rzędu $O(n)$ dzięki liniowemu rozwiązywaniu układu równań z użyciem algorytmu Thomasa. 
+\qquad Prezentowana w tym dokumencie metoda numerycznego obliczania wyniku równania różniczkowego pozwala z dobrą dokładnością wyznaczyć prawidłowe rozwiązanie, co pokazuje porównanie przedstawione w poprzednim punkcie. Dodatkowo wyznaczenie błędu globalnego pokazuje, że prezentowana metoda w istocie ma jest rzędu $O(h^2)$. Dla $n = 10$ (czyli $h = 0.1$) błąd globalny wynosił 0.01042767, czyli w przybliżeniu $h^2$. Tak samo sytuacja wyglądała dla $n = 50$, czyli $h=0.02$, gdzie błąd globalny wyniósł 0.0004148776. Prezentowana metoda dodatkowo ma bardzo dobrą złożoność obliczeniową rzędu $O(n)$ dzięki liniowemu rozwiązywaniu układu równań z użyciem algorytmu Thomasa. 
 
 \begin{thebibliography}{}
 \bibitem{texbook}
