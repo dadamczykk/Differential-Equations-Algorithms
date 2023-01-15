@@ -1,4 +1,7 @@
 # Projects for Differential and difference equations course at AGH UST
+
+Projects were written in Polish, as it was the language of instruction during the course.
+
 ## First project
 Solution of first order differential equation using following methods:
 
