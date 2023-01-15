@@ -54,7 +54,7 @@ solve_equation <- function(n){
   return (output)
 }
 
-plot_approximate_sollution <- function(eq, color="violet"){
+plot_approximate_solution <- function(eq, color="violet"){
   n = length(eq) - 1
   h = 1 / n
   a = 0
@@ -97,8 +97,8 @@ approx50 <- solve_equation(50)
 print(approx10)
 print(approx50)
 
-plot_approximate_sollution(approx10)
-plot_approximate_sollution(approx50)
+plot_approximate_solution(approx10)
+plot_approximate_solution(approx50)
 
 compare_with_exact(approx10)
 compare_with_exact(approx50)
