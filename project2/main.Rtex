@@ -252,7 +252,7 @@ solve_equation(50)
 \qquad Przedstawiona poniżej procedura odpowiada za narysowanie wykresu $u(x)$ przy pomocy wartości uzyskanych z funkcji $solve\_equation$.
 
 <<>>=
-plot_approximate_sollution <- function(eq, color="violet"){
+plot_approximate_solution <- function(eq, color="violet"){
   n = length(eq) - 1
   h = 1 / n
   a = 0
@@ -267,10 +267,10 @@ plot_approximate_sollution <- function(eq, color="violet"){
 \noindent \qquad Poniżej prezentowane są wykresy dla rozwiązań z wartościami $n = 10$, oraz $n = 50$.
 
 <<plot1, fig.pos="h",fig.align="center", fig.height=4, fig.width=4>>=
-plot_approximate_sollution(solve_equation(10))
+plot_approximate_solution(solve_equation(10))
  @
 <<plot2, fig.pos="h",fig.align="center", fig.height=4, fig.width=4>>=
-plot_approximate_sollution(solve_equation(50))
+plot_approximate_solution(solve_equation(50))
 @
 
 \section{Porównanie z rozwiązaniem dokładnym}
